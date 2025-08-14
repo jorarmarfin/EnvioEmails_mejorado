@@ -1,0 +1,4 @@
+pandas~=2.3.0
+openpyxl
+ttkbootstrap~=1.13.10
+python-dotenv~=1.1.0

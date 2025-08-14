@@ -1,0 +1,8 @@
+{
+    "usar_archivos_por_defecto": false,
+    "excel_file": "/mnt/DATOS/LUIS/PycharmProjects/EnvioEmails_mejorado/data/emails_test.xlsx",
+    "body_file": "/mnt/DATOS/LUIS/PycharmProjects/EnvioEmails_mejorado/templates/body_2.html",
+    "subject": "¡Agustín Laje vuelve a Lima y tú puedes llevarte sus libros con descuento!",
+    "total_correos": 500,
+    "delay_segundos": 2
+}
