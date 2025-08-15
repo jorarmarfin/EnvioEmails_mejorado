@@ -74,12 +74,16 @@ Ideal para usar en un PC de escritorio.
     -   Haz clic en "Ejecutar envío ahora" para iniciar el proceso.
     -   Puedes reiniciar el contador de envíos con "Reiniciar contador a 0".
 
-### 3. Enviar un único correo de prueba
+## API de Consulta
 
-Puedes enviar un correo a un destinatario específico para verificar que la configuración y la plantilla funcionan correctamente.
+El proyecto incluye una API para consultar el estado de las campañas y el total de correos enviados.
 
+**Lanzar la API:**
 ```bash
-python3 console_configurador.py --send-single "correo@ejemplo.com"
+python3 -m uvicorn api:app --reload
 ```
 
-Esto utilizará la configuración de asunto y cuerpo que esté guardada en `config.json`.
+**Endpoints:**
+
+-   **`GET /api/campaigns`**: Devuelve el historial de campañas desde `campaigns.json`.
+-   **`GET /api/sent/total`**: Muestra el número total de correos enviados según el contador global.
