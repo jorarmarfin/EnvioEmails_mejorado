@@ -6,6 +6,8 @@ from ttkbootstrap.constants import *
 from config_manager import ConfigManager
 from email_sender import EmailSender
 import pandas as pd
+from dotenv import load_dotenv
+load_dotenv()
 
 CONFIG_FILE = "config.json"
 COUNTER_FILE = "contador/contador.txt"
@@ -99,7 +101,7 @@ class EmailConfiguratorGUI:
         personalized_body = body_template.replace('{{names}}', str(names))
 
         smtp_settings = self.config_manager.get_smtp_settings()
-        required_keys = ["smtp_host", "smtp_port", "smtp_user", "smtp_password"]
+        required_keys = ["smtp_host", "smtp_port", "smtp_user", "smtp_password","email_from"]
         if not all(smtp_settings.get(key) for key in required_keys):
             messagebox.showerror("Error de Configuración", "La configuración de SMTP no está completa. Revisa tu archivo .env.")
             return

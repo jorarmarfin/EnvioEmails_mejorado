@@ -6,7 +6,8 @@ class ConfigManager:
     def __init__(self, config_file="config.json", counter_file="contador/contador.txt"):
         self.config_file = config_file
         self.counter_file = counter_file
-        load_dotenv()
+        dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+        load_dotenv(dotenv_path=dotenv_path)
 
     def load_config(self):
         if not os.path.exists(self.config_file):
@@ -20,11 +21,11 @@ class ConfigManager:
 
     def get_smtp_settings(self):
         return {
-            "host": os.getenv("SMTP_HOST"),
-            "port": os.getenv("SMTP_PORT"),
-            "user": os.getenv("SMTP_USER"),
-            "password": os.getenv("SMTP_PASSWORD"),
-            "from": os.getenv("SMTP_FROM")
+            "smtp_host": os.getenv("SMTP_HOST"),
+            "smtp_port": os.getenv("SMTP_PORT"),
+            "smtp_user": os.getenv("SMTP_USER"),
+            "smtp_password": os.getenv("SMTP_PASSWORD"),
+            "email_from": os.getenv("SMTP_FROM")
         }
 
     def read_counter(self):

@@ -32,11 +32,11 @@ def send_single_email(email_address, config_manager):
         return
 
     email_sender = EmailSender(
-        smtp_settings['host'],
-        smtp_settings['port'],
-        smtp_settings['user'],
-        smtp_settings['password'],
-        smtp_settings['from']
+        smtp_settings['smtp_host'],
+        smtp_settings['smtp_port'],
+        smtp_settings['smtp_user'],
+        smtp_settings['smtp_password'],
+        smtp_settings['email_from']
     )
 
     body_file = config['body_file']
