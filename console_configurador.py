@@ -1,10 +1,58 @@
 import argparse
 from config_manager import ConfigManager
 import subprocess
+from email_sender import EmailSender
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 CONFIG_FILE = "config.json"
 COUNTER_FILE = "contador/contador.txt"
 SENDER_SCRIPT = "sender.py"
+
+def load_body_template(path):
+    """Carga la plantilla de correo desde un archivo."""
+    if not os.path.exists(path):
+        print(f'Error: El archivo de plantilla {path} no existe.')
+        return None
+    with open(path, 'r', encoding='utf-8') as file:
+        return file.read()
+
+def send_single_email(email_address, config_manager):
+    """Envía un único correo electrónico."""
+    try:
+        config = config_manager.load_config()
+        smtp_settings = config_manager.get_smtp_settings()
+    except FileNotFoundError as e:
+        print(f"Error de configuración: {e}. Ejecuta el configurador para crear el archivo.")
+        return
+
+    if not all(smtp_settings.values()):
+        print("Error: La configuración de SMTP no está completa. Revisa tu archivo .env.")
+        return
+
+    email_sender = EmailSender(
+        smtp_settings['host'],
+        smtp_settings['port'],
+        smtp_settings['user'],
+        smtp_settings['password'],
+        smtp_settings['from']
+    )
+
+    body_file = config['body_file']
+    subject = config['subject']
+    body_template = load_body_template(body_file)
+    if body_template is None:
+        return
+
+    if email_sender.connect():
+        personalized_body = body_template.replace('{{names}}', 'Amigo(a)')
+        print(f"Enviando correo a: {email_address}")
+        if email_sender.send_email(email_address, subject, personalized_body):
+            print("Correo enviado exitosamente.")
+        else:
+            print("Fallo al enviar el correo.")
+        email_sender.disconnect()
 
 def main():
     config_manager = ConfigManager(CONFIG_FILE, COUNTER_FILE)
@@ -18,8 +66,13 @@ def main():
     parser.add_argument("--delay", type=int, help="Retraso en segundos entre cada envío de correo.")
     parser.add_argument("--reset-counter", action="store_true", help="Reiniciar el contador de correos a 0.")
     parser.add_argument("--send", action="store_true", help="Ejecutar el envío de correos con la configuración guardada.")
+    parser.add_argument("--send-single", type=str, help="Enviar un único correo a la dirección especificada.")
 
     args = parser.parse_args()
+
+    if args.send_single:
+        send_single_email(args.send_single, config_manager)
+        return
 
     try:
         config = config_manager.load_config()
@@ -60,9 +113,6 @@ def main():
             print(f"El script de envío terminó con un error: {e}")
         except FileNotFoundError:
             print(f"Error: No se encontró el script '{SENDER_SCRIPT}'.")
-
-if __name__ == "__main__":
-    main()
 
 if __name__ == "__main__":
     main()

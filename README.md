@@ -74,26 +74,12 @@ Ideal para usar en un PC de escritorio.
     -   Haz clic en "Ejecutar envío ahora" para iniciar el proceso.
     -   Puedes reiniciar el contador de envíos con "Reiniciar contador a 0".
 
-### 2. Usando la Línea de Comandos (CLI)
+### 3. Enviar un único correo de prueba
 
-Perfecto para servidores o para integrar en otros scripts.
+Puedes enviar un correo a un destinatario específico para verificar que la configuración y la plantilla funcionan correctamente.
 
--   **Lanzar la ayuda:**
-    ```bash
-    python3 console_configurador.py --help
-    ```
--   **Configurar el proyecto:**
-    Puedes establecer los parámetros de configuración directamente con los argumentos.
-    ```bash
-    # Ejemplo: Configurar para usar archivos personalizados
-    python3 console_configurador.py --set-custom --excel "data/mi_lista.xlsx" --body "templates/mi_plantilla.html" --subject "Un Asunto Importante" --delay 5
-    ```
--   **Ejecutar el envío:**
-    Una vez guardada la configuración, lanza el envío con el argumento `--send`.
-    ```bash
-    python3 console_configurador.py --send
-    ```
--   **Reiniciar el contador:**
-    ```bash
-    python3 console_configurador.py --reset-counter
-    ```
+```bash
+python3 console_configurador.py --send-single "correo@ejemplo.com"
+```
+
+Esto utilizará la configuración de asunto y cuerpo que esté guardada en `config.json`.

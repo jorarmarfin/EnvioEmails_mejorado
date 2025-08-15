@@ -20,11 +20,11 @@ class ConfigManager:
 
     def get_smtp_settings(self):
         return {
-            "smtp_host": os.getenv("EMAIL_HOST"),
-            "smtp_port": os.getenv("EMAIL_PORT"),
-            "smtp_user": os.getenv("EMAIL_USER"),
-            "smtp_password": os.getenv("EMAIL_PASSWORD"),
-            "email_from": os.getenv("EMAIL_FROM", "no-reply@padresperuanos.pe")
+            "host": os.getenv("SMTP_HOST"),
+            "port": os.getenv("SMTP_PORT"),
+            "user": os.getenv("SMTP_USER"),
+            "password": os.getenv("SMTP_PASSWORD"),
+            "from": os.getenv("SMTP_FROM")
         }
 
     def read_counter(self):

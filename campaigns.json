@@ -1,0 +1,17 @@
+[
+    {
+        "campaign_name": "Campaña de Bienvenida Agosto",
+        "submission_date": "2025-08-14",
+        "sent_count": 150
+    },
+    {
+        "campaign_name": "Alerta General del Sistema",
+        "submission_date": "2025-08-13",
+        "sent_count": 42
+    },
+    {
+        "campaign_name": "Promoción Especial Verano",
+        "submission_date": "2025-08-10",
+        "sent_count": 850
+    }
+]

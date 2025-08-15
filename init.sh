@@ -49,5 +49,7 @@ else
     echo "El archivo .gitignore ya existe."
 fi
 
+mkdir data
+
 echo -e "\n\033[1;32m¡Instalación completada!\033[0m"
 echo "Para activar el entorno virtual, ejecuta: source .venv/bin/activate"
