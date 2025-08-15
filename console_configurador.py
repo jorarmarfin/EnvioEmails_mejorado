@@ -57,7 +57,27 @@ def send_single_email(email_address, config_manager):
 def main():
     config_manager = ConfigManager(CONFIG_FILE, COUNTER_FILE)
 
-    parser = argparse.ArgumentParser(description="Herramienta de configuración y envío de correos masivos.")
+    parser = argparse.ArgumentParser(
+        description="Herramienta de configuración y envío de correos masivos.",
+        formatter_class=argparse.RawTextHelpFormatter,
+        epilog='''
+Ejemplos de uso:
+  # Configurar y guardar rutas personalizadas para el próximo envío
+  python %(prog)s --set-custom --excel ruta/a/tus/emails.xlsx --body ruta/a/tu/plantilla.html --subject "Nuevo Asunto"
+
+  # Activar la configuración por defecto (usará las rutas en config.json)
+  python %(prog)s --set-default
+
+  # Iniciar el envío de correos con la configuración previamente guardada
+  python %(prog)s --send
+
+  # Enviar un único correo de prueba a una dirección específica
+  python %(prog)s --send-single test@example.com
+
+  # Reiniciar el contador de envíos
+  python %(prog)s --reset-counter
+'''
+    )
     parser.add_argument("--set-default", action="store_true", help="Usar configuración por defecto (definida en config.json)")
     parser.add_argument("--set-custom", action="store_true", help="Usar configuración personalizada (ignora la opción por defecto)")
     parser.add_argument("--excel", type=str, help="Ruta al archivo Excel con los correos.")
