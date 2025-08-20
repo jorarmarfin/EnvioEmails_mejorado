@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import logging
 import time
+import re
 from config_manager import ConfigManager
 from email_sender import EmailSender
 
@@ -10,6 +11,15 @@ SESSION_LIMIT = 4900
 
 # Configuración del logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def is_valid_email(email):
+    """Valida el formato de un correo electrónico."""
+    if not isinstance(email, str):
+        return False
+    # Expresión regular para validar un correo electrónico
+    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}
+
+    return re.match(regex, email) is not None
 
 def load_body_template(path):
     """Carga la plantilla de correo desde un archivo."""
@@ -22,7 +32,7 @@ def load_body_template(path):
 def run_sender():
     """
     Función principal para ejecutar el envío de correos masivos de forma eficiente,
-    manejando límites de sesión SMTP.
+    manejando límites de sesión SMTP y validando correos.
     """
     try:
         config_manager = ConfigManager()
@@ -72,9 +82,8 @@ def run_sender():
         logging.info('No hay más correos por enviar. Todos en la lista ya han sido procesados.')
         return
 
-    # Conectar al servidor SMTP
     if not email_sender.connect():
-        return # No se pudo conectar, error ya logueado
+        return
 
     emails_sent_total = 0
     emails_in_session = 0
@@ -82,17 +91,22 @@ def run_sender():
 
     try:
         for index, row in df.iloc[start_index:].iterrows():
-            # --- Lógica de reconexión por límite de sesión ---
             if emails_in_session >= SESSION_LIMIT:
                 logging.info(f"Límite de sesión alcanzado ({SESSION_LIMIT} correos). Reiniciando conexión...")
                 email_sender.disconnect()
-                time.sleep(5) # Pausa prudencial antes de reconectar
+                time.sleep(5)
                 if not email_sender.connect():
                     logging.error("No se pudo reconectar al servidor. Abortando el proceso.")
-                    break # Salir del bucle si la reconexión falla
-                emails_in_session = 0 # Reiniciar contador de sesión
+                    break
+                emails_in_session = 0
 
             to_email = row['email']
+
+            if not is_valid_email(to_email):
+                logging.warning(f"[{index + 1}/{total_emails_in_file}] Omitiendo correo inválido o nulo en la línea {index + 2}: {to_email}")
+                config_manager.save_counter(index + 1) #Avanzo el contador para no reintentar
+                continue
+
             names = row.get('names', 'Amigo(a)')
             personalized_body = body_template.replace('{{names}}', str(names))
 
@@ -103,13 +117,12 @@ def run_sender():
                 emails_sent_total += 1
                 emails_in_session += 1
             else:
-                logging.error(f"Fallo al enviar a {to_email}. Se detiene el proceso para evitar errores en cascada.")
-                break
+                logging.error(f"Fallo al enviar a {to_email} en la línea {index + 2}. Continuando con el siguiente.")
+                config_manager.save_counter(index + 1) #Avanzo el contador para no reintentar
 
             time.sleep(delay)
 
     finally:
-        # Asegurarse de cerrar la conexión al final o si ocurre un error
         email_sender.disconnect()
         logging.info(f"✅ Proceso de envío finalizado. Correos enviados en esta sesión: {emails_sent_total}.")
 
