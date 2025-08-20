@@ -41,7 +41,7 @@ def run_sender():
         smtp_settings['smtp_port'],
         smtp_settings['smtp_user'],
         smtp_settings['smtp_password'],
-        smtp_settings['smtp_from']
+        smtp_settings['email_from']
     )
 
     excel_file = config['excel_file']
