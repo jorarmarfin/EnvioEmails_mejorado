@@ -37,11 +37,11 @@ def run_sender():
         return
 
     email_sender = EmailSender(
-        smtp_settings['host'],
-        smtp_settings['port'],
-        smtp_settings['user'],
-        smtp_settings['password'],
-        smtp_settings['from']
+        smtp_settings['smtp_host'],
+        smtp_settings['smtp_port'],
+        smtp_settings['smtp_user'],
+        smtp_settings['smtp_password'],
+        smtp_settings['smtp_from']
     )
 
     excel_file = config['excel_file']
