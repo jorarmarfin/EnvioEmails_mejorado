@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Editar {{ filename }}{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Editar Template</h1>
+    <p class="muted">Archivo: <strong>{{ filename }}</strong></p>
+    <form method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+        <label for="content">HTML</label>
+        <textarea id="content" name="content" spellcheck="false">{{ content }}</textarea>
+        <div style="margin-top: 12px;">
+            <button class="btn btn-success" type="submit">Guardar cambios</button>
+            <a class="btn btn-light" href="{{ url_for('files', section='templates') }}">Volver</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

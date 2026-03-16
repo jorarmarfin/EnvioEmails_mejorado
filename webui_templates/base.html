@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Panel de Campanas{% endblock %}</title>
+    <style>
+        :root {
+            --bg: #f6f7fb;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --primary: #1f6feb;
+            --danger: #b42318;
+            --success: #137333;
+            --warning: #946200;
+            --card: #ffffff;
+            --border: #d0d7de;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .topbar {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .topbar nav a {
+            margin-right: 16px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .topbar nav a:last-child { margin-right: 0; }
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 16px 24px;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        h1, h2, h3 { margin-top: 0; }
+        .muted { color: var(--muted); }
+        .row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 14px;
+            background: #fff;
+        }
+        textarea {
+            min-height: 320px;
+            font-family: "Consolas", monospace;
+            resize: vertical;
+        }
+        .btn {
+            border: 0;
+            border-radius: 6px;
+            padding: 9px 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-light { background: #e5e7eb; color: #111827; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn + .btn { margin-left: 8px; }
+        .flash {
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+        }
+        .flash.success { background: #ecfdf3; color: #065f46; border-color: #a7f3d0; }
+        .flash.info { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+        .flash.warning { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
+        .flash.danger { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .table-actions form,
+        .inline-form {
+            display: inline;
+        }
+        .login-wrap {
+            max-width: 420px;
+            margin: 70px auto;
+            padding: 0 16px;
+        }
+        .code {
+            background: #111827;
+            color: #e5e7eb;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-family: "Consolas", monospace;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+{% if session.get('logged_in') %}
+<div class="topbar">
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Inicio</a>
+        <a href="{{ url_for('files', section='templates') }}">Templates</a>
+        <a href="{{ url_for('files', section='data') }}">Data</a>
+        <a href="{{ url_for('config') }}">Configuracion</a>
+    </nav>
+    <div>
+        <span class="muted">{{ session.get('username') }}</span>
+        <form class="inline-form" method="post" action="{{ url_for('logout') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <button class="btn btn-light" type="submit">Salir</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

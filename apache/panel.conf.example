@@ -1,0 +1,18 @@
+<VirtualHost *:443>
+    ServerName panel.tudominio.com
+
+    SSLEngine on
+    SSLCertificateFile /ruta/fullchain.pem
+    SSLCertificateKeyFile /ruta/privkey.pem
+
+    <Location />
+        AuthType Basic
+        AuthName "Panel Privado"
+        AuthUserFile /etc/apache2/.htpasswd
+        Require valid-user
+    </Location>
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5000/
+    ProxyPassReverse / http://127.0.0.1:5000/
+</VirtualHost>

@@ -25,11 +25,18 @@ pip install -r requirements.txt
 if [ ! -f ".env" ]; then
     echo "Creando archivo .env de ejemplo..."
     echo "# Configuración del servidor de correo (SMTP)" > .env
-    echo "EMAIL_HOST=smtp.example.com" >> .env
-    echo "EMAIL_PORT=587" >> .env
-    echo "EMAIL_USER=tu_usuario@example.com" >> .env
-    echo "EMAIL_PASSWORD=tu_contraseña_secreta" >> .env
-    echo "EMAIL_FROM=tu_remitente@example.com" >> .env
+    echo "SMTP_HOST=smtp.example.com" >> .env
+    echo "SMTP_PORT=587" >> .env
+    echo "SMTP_USER=tu_usuario@example.com" >> .env
+    echo "SMTP_PASSWORD=tu_contraseña_secreta" >> .env
+    echo "SMTP_FROM=tu_remitente@example.com" >> .env
+    echo "" >> .env
+    echo "# Credenciales del panel web (sin base de datos)" >> .env
+    echo "PANEL_USERNAME=admin" >> .env
+    echo "PANEL_PASSWORD_HASH=REEMPLAZAR_CON_HASH" >> .env
+    echo "PANEL_SECRET_KEY=REEMPLAZAR_CON_UNA_CLAVE_LARGA" >> .env
+    echo "PANEL_HOST=127.0.0.1" >> .env
+    echo "PANEL_PORT=5000" >> .env
     echo -e "\n\033[1;33mIMPORTANTE: Edita el archivo .env con tus credenciales de correo reales.\033[0m"
 else
     echo "El archivo .env ya existe. No se ha modificado."
@@ -49,7 +56,7 @@ else
     echo "El archivo .gitignore ya existe."
 fi
 
-mkdir data
+mkdir -p data templates trash
 
 echo -e "\n\033[1;32m¡Instalación completada!\033[0m"
 echo "Para activar el entorno virtual, ejecuta: source .venv/bin/activate"

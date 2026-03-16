@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ section_title }} | Panel{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>{{ section_title }}</h1>
+    <p class="muted">Permitidos: {{ extensions }}</p>
+
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('upload_file', section=section) }}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+        <div class="row">
+            <div>
+                <label for="file">Archivo</label>
+                <input id="file" type="file" name="file" required>
+            </div>
+            <div>
+                <label>&nbsp;</label>
+                <label><input type="checkbox" name="replace"> Reemplazar si existe</label>
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit" style="margin-top: 12px;">Subir archivo</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Listado</h2>
+    {% if files %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Tamano</th>
+                <th>Modificado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in files %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.size }} bytes</td>
+                <td>{{ item.modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td class="table-actions">
+                    {% if item.editable %}
+                    <a class="btn btn-light" href="{{ url_for('edit_template', filename=item.name) }}">Editar</a>
+                    {% endif %}
+                    <form method="post" action="{{ url_for('delete_file', section=section, filename=item.name) }}" onsubmit="return confirm('Se movera a trash. Continuar?')">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <button class="btn btn-danger" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="muted">No hay archivos en esta carpeta.</p>
+    {% endif %}
+</div>
+{% endblock %}

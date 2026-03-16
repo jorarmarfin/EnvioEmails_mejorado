@@ -1,89 +1,161 @@
 # Envio de Correos Masivos
 
-Este es un proyecto de Python para enviar correos masivos utilizando una lista de destinatarios desde un archivo Excel. La aplicación cuenta con dos interfaces: una gráfica (GUI) para uso en estaciones de trabajo y una de línea de comandos (CLI) para uso en servidores.
+Proyecto Python para envio de correos masivos desde un Excel (`.xlsx`) usando templates HTML.
 
-## Características
+## Componentes
 
-- **Envío Eficiente:** Procesa y envía correos en un único proceso para mayor rendimiento.
-- **Personalización:** Permite usar plantillas HTML para el cuerpo del correo y personalizarlas con datos del Excel (ej. `{{names}}`).
-- **Doble Interfaz:**
-    - **GUI (Gráfica):** Una interfaz amigable para configurar y ejecutar los envíos fácilmente.
-    - **CLI (Consola):** Permite configurar y lanzar los envíos mediante comandos, ideal para servidores o automatización.
-- **Gestión de Progreso:** Guarda el progreso del envío, permitiendo reanudar desde el último correo enviado en caso de interrupción.
-- **Configuración Flexible:** Toda la configuración se maneja a través de un archivo `config.json` y las credenciales de forma segura en un archivo `.env`.
+- `sender.py`: envio masivo principal.
+- `console_configurador.py`: configuracion y pruebas por CLI.
+- `gui_configurador.py`: interfaz de escritorio (Tk).
+- `panel_web.py`: panel web para gestionar archivos y configuracion (sin envio masivo).
+- `api.py`: API de consulta de campañas y contador global.
 
-## Prerrequisitos
+## Instalacion
 
-- Python 3.8 o superior.
+1. Ejecuta:
+```bash
+bash init.sh
+```
 
-## Instalación y Configuración
+2. Activa el entorno virtual:
+```bash
+source .venv/bin/activate
+```
 
-1.  **Ejecutar el script de inicialización:**
-    Este script preparará todo lo necesario: creará un entorno virtual, instalará las dependencias y generará los archivos de configuración iniciales.
-    ```bash
-    bash init.sh
-    ```
+3. Instala/actualiza dependencias:
+```bash
+pip install -r requirements.txt
+```
 
-2.  **Activar el entorno virtual:**
-    Cada vez que trabajes en el proyecto en una nueva terminal, activa el entorno:
-    ```bash
-    source .venv/bin/activate
-    ```
+## Configuracion de `.env`
 
-3.  **Configurar las credenciales de correo:**
-    El script `init.sh` creó un archivo llamado `.env`. **Debes editar este archivo** con tus credenciales reales del servidor de correo (SMTP).
-    ```dotenv
-    # Archivo: .env
-    EMAIL_HOST=smtp.tuservidor.com
-    EMAIL_PORT=587
-    EMAIL_USER=tu_correo@dominio.com
-    EMAIL_PASSWORD=tu_contraseña
-    EMAIL_FROM=tu_correo_remitente@dominio.com
-    ```
+El proyecto usa variables `SMTP_*`:
 
-## Formato de Datos (Archivo Excel)
+```dotenv
+SMTP_HOST=smtp.tuservidor.com
+SMTP_PORT=587
+SMTP_USER=tu_correo@dominio.com
+SMTP_PASSWORD=tu_clave
+SMTP_FROM=tu_remitente@dominio.com
+```
 
-Para que la aplicación funcione correctamente, tu archivo Excel (`.xlsx`) debe tener una columna llamada `email`.
+Para el panel web (login simple sin DB):
 
-Opcionalmente, puedes añadir otras columnas para personalizar el correo. Por ejemplo, si añades una columna `names`, puedes usar `{{names}}` en tu plantilla HTML, y el sistema la reemplazará con el valor correspondiente de cada fila.
+```dotenv
+PANEL_USERNAME=admin
+PANEL_PASSWORD_HASH=<hash>
+# Opcional si no quieres hash: PANEL_PASSWORD=tu_clave_plana
+PANEL_SECRET_KEY=<clave_larga_aleatoria>
+PANEL_HOST=127.0.0.1
+PANEL_PORT=5000
+```
 
-Ejemplo de `data/emails_test.xlsx`:
+Generar hash de password:
+```bash
+python3 -c "from werkzeug.security import generate_password_hash; print(generate_password_hash('TU_PASSWORD'))"
+```
 
-| email                 | names      |
-| --------------------- | ---------- |
-| correo1@ejemplo.com   | Juan Pérez |
-| correo2@ejemplo.com   | Ana García |
+Pega el hash completo en `PANEL_PASSWORD_HASH` y elimina placeholders como `REEMPLAZAR_CON_HASH`.
 
-## Cómo Usar la Aplicación
+Generar `PANEL_SECRET_KEY`:
+```bash
+python3 -c "import secrets; print(secrets.token_hex(32))"
+```
 
-Puedes usar la interfaz gráfica o la de línea de comandos.
+## Panel Web
 
-### 1. Usando la Interfaz Gráfica (GUI)
+Lanzar panel:
+```bash
+python3 panel_web.py
+```
 
-Ideal para usar en un PC de escritorio.
+Funciones del panel:
 
--   **Lanzar la aplicación:**
-    ```bash
-    python3 gui_configurador.py
-    ```
--   **Configuración:**
-    -   Usa la interfaz para seleccionar tu archivo Excel, tu plantilla HTML y definir el asunto y el retraso entre correos.
-    -   Si marcas "Usar configuración por defecto", se usarán los archivos de prueba incluidos en el proyecto.
-    -   Guarda tu configuración con el botón "Guardar configuración".
--   **Envío:**
-    -   Haz clic en "Ejecutar envío ahora" para iniciar el proceso.
-    -   Puedes reiniciar el contador de envíos con "Reiniciar contador a 0".
+- Gestion de archivos en `templates/` y `data/`:
+  - subir,
+  - reemplazar,
+  - eliminar (mueve a `trash/`),
+  - editar HTML de templates.
+- Configuracion de campaña (`config.json`):
+  - archivo Excel,
+  - template,
+  - asunto,
+  - delay.
+- Configuracion SMTP en `.env`.
+
+El envio masivo final se mantiene por consola.
+
+## Flujo Operativo Recomendado
+
+1. Entra al panel web y prepara:
+   - `templates/*.html`
+   - `data/*.xlsx`
+   - `config.json` y SMTP.
+
+2. Envia un test por consola:
+```bash
+python3 console_configurador.py --send-single tu_correo@dominio.com
+```
+
+3. Si todo esta OK, envia campaña completa:
+```bash
+python3 sender.py
+```
+
+## Login en Apache (recomendado en servidor)
+
+Si publicas el panel en tu servidor, agrega capa extra con Apache Basic Auth.
+
+1. Crea archivo de usuarios:
+```bash
+htpasswd -cB /etc/apache2/.htpasswd tu_usuario
+```
+
+2. Activa modulos necesarios:
+```bash
+sudo a2enmod proxy proxy_http ssl auth_basic authn_file
+```
+
+3. Ejemplo de VirtualHost (HTTPS + proxy + auth):
+
+```apache
+<VirtualHost *:443>
+    ServerName panel.tudominio.com
+
+    SSLEngine on
+    SSLCertificateFile /ruta/fullchain.pem
+    SSLCertificateKeyFile /ruta/privkey.pem
+
+    <Location />
+        AuthType Basic
+        AuthName "Panel Privado"
+        AuthUserFile /etc/apache2/.htpasswd
+        Require valid-user
+    </Location>
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5000/
+    ProxyPassReverse / http://127.0.0.1:5000/
+</VirtualHost>
+```
 
 ## API de Consulta
 
-El proyecto incluye una API para consultar el estado de las campañas y el total de correos enviados.
-
-**Lanzar la API:**
+Lanzar API:
 ```bash
 python3 -m uvicorn api:app --reload
 ```
 
-**Endpoints:**
+Endpoints:
 
--   **`GET /api/campaigns`**: Devuelve el historial de campañas desde `campaigns.json`.
--   **`GET /api/sent/total`**: Muestra el número total de correos enviados según el contador global.
+- `GET /api/campaigns`
+- `GET /api/sent/total`
+
+## Estructura Relevante
+
+- `templates/`: templates HTML de correo.
+- `data/`: Excel de destinatarios.
+- `trash/`: archivos eliminados desde el panel.
+- `contador/contador.txt`: progreso de envio.
+- `config.json`: campaña activa.
+- `.env`: SMTP + credenciales del panel.

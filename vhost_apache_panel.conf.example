@@ -1,0 +1,25 @@
+<VirtualHost *:80>
+    ServerName panel.tudominio.com
+    Redirect permanent / https://panel.tudominio.com/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName panel.tudominio.com
+
+    SSLEngine on
+    SSLCertificateFile /ruta/fullchain.pem
+    SSLCertificateKeyFile /ruta/privkey.pem
+
+    # Capa adicional de login en Apache.
+    AuthType Basic
+    AuthName "Panel Privado"
+    AuthUserFile /etc/apache2/.htpasswd
+    Require valid-user
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:5000/
+    ProxyPassReverse / http://127.0.0.1:5000/
+
+    ErrorLog ${APACHE_LOG_DIR}/panel_error.log
+    CustomLog ${APACHE_LOG_DIR}/panel_access.log combined
+</VirtualHost>
