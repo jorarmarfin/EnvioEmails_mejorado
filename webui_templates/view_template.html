@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Ver {{ filename }}{% endblock %}
+{% block content %}
+<div class="page-head">
+    <h1>Vista previa HTML</h1>
+    <p class="muted">Archivo: <strong>{{ filename }}</strong></p>
+</div>
+
+<div class="card">
+    <div class="actions">
+        <a class="btn btn-light" href="{{ url_for('files', section='templates') }}">Volver</a>
+        <a class="btn btn-primary" href="{{ url_for('download_file', section='templates', filename=filename) }}">Descargar</a>
+        <a class="btn btn-outline" href="{{ url_for('edit_template', filename=filename) }}">Editar</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Render en navegador</h2>
+    <iframe
+        title="preview-{{ filename }}"
+        sandbox
+        style="width: 100%; min-height: 680px; border: 1px solid var(--border); border-radius: 12px; background: #fff;"
+        srcdoc="{{ content | e }}">
+    </iframe>
+</div>
+{% endblock %}

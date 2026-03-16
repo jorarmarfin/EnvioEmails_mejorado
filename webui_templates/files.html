@@ -1,57 +1,72 @@
 {% extends "base.html" %}
 {% block title %}{{ section_title }} | Panel{% endblock %}
 {% block content %}
-<div class="card">
+<div class="page-head">
     <h1>{{ section_title }}</h1>
-    <p class="muted">Permitidos: {{ extensions }}</p>
+    <p class="muted">Extensiones permitidas: {{ extensions }}</p>
+</div>
 
+<div class="card">
+    <h2>Subir archivo</h2>
     <form method="post" enctype="multipart/form-data" action="{{ url_for('upload_file', section=section) }}">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
-        <div class="row">
+        <div class="grid-2">
             <div>
-                <label for="file">Archivo</label>
+                <label for="file">Selecciona archivo</label>
                 <input id="file" type="file" name="file" required>
             </div>
             <div>
                 <label>&nbsp;</label>
-                <label><input type="checkbox" name="replace"> Reemplazar si existe</label>
+                <label><input type="checkbox" name="replace"> Reemplazar si ya existe</label>
             </div>
         </div>
-        <button class="btn btn-primary" type="submit" style="margin-top: 12px;">Subir archivo</button>
+        <div class="actions">
+            <button class="btn btn-primary" type="submit">Subir</button>
+        </div>
     </form>
 </div>
 
 <div class="card">
     <h2>Listado</h2>
     {% if files %}
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Tamano</th>
-                <th>Modificado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for item in files %}
-            <tr>
-                <td>{{ item.name }}</td>
-                <td>{{ item.size }} bytes</td>
-                <td>{{ item.modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                <td class="table-actions">
-                    {% if item.editable %}
-                    <a class="btn btn-light" href="{{ url_for('edit_template', filename=item.name) }}">Editar</a>
-                    {% endif %}
-                    <form method="post" action="{{ url_for('delete_file', section=section, filename=item.name) }}" onsubmit="return confirm('Se movera a trash. Continuar?')">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
-                        <button class="btn btn-danger" type="submit">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tamano</th>
+                    <th>Modificado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in files %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.size }} bytes</td>
+                    <td>{{ item.modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn btn-light btn-sm" href="{{ url_for('download_file', section=section, filename=item.name) }}">Descargar</a>
+                            {% if item.editable %}
+                            <a class="btn btn-light btn-sm" href="{{ url_for('view_template', filename=item.name) }}">Ver HTML</a>
+                            <a class="btn btn-outline btn-sm" href="{{ url_for('edit_template', filename=item.name) }}">Editar</a>
+                            <form method="post" action="{{ url_for('duplicate_template', filename=item.name) }}">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                                <button class="btn btn-warning btn-sm" type="submit">Duplicar</button>
+                            </form>
+                            {% endif %}
+                            <form method="post" action="{{ url_for('delete_file', section=section, filename=item.name) }}" onsubmit="return confirm('Se movera a trash. Continuar?')">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                                <button class="btn btn-danger btn-sm" type="submit">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
     <p class="muted">No hay archivos en esta carpeta.</p>
     {% endif %}

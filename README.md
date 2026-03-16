@@ -73,9 +73,12 @@ Funciones del panel:
 
 - Gestion de archivos en `templates/` y `data/`:
   - subir,
+  - descargar,
   - reemplazar,
   - eliminar (mueve a `trash/`),
-  - editar HTML de templates.
+  - duplicar templates,
+  - editar HTML de templates,
+  - ver vista previa HTML de templates.
 - Configuracion de campaña (`config.json`):
   - archivo Excel,
   - template,

@@ -1,41 +1,47 @@
 {% extends "base.html" %}
 {% block title %}Inicio | Panel{% endblock %}
 {% block content %}
-<div class="card">
-    <h1>Resumen Operativo</h1>
-    <p class="muted">Gestiona archivos y configuracion por web. El envio final sigue por consola.</p>
-    <div class="row">
-        <div class="card">
-            <h3>Templates</h3>
-            <p><strong>{{ files_summary['templates'] }}</strong> archivo(s)</p>
-            <a class="btn btn-primary" href="{{ url_for('files', section='templates') }}">Administrar templates</a>
-        </div>
-        <div class="card">
-            <h3>Excel</h3>
-            <p><strong>{{ files_summary['data'] }}</strong> archivo(s)</p>
-            <a class="btn btn-primary" href="{{ url_for('files', section='data') }}">Administrar data</a>
-        </div>
-        <div class="card">
-            <h3>Configuracion</h3>
-            <p>SMTP y campaña actual.</p>
-            <a class="btn btn-primary" href="{{ url_for('config') }}">Editar configuracion</a>
-        </div>
+<div class="page-head">
+    <h1>Centro de Operaciones</h1>
+    <p class="muted">Prepara campanas por web y ejecuta el envio final desde consola.</p>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <p class="kpi-label">Templates activos</p>
+        <p class="kpi-value">{{ files_summary['templates'] }}</p>
+        <a class="btn btn-outline btn-sm" href="{{ url_for('files', section='templates') }}">Administrar templates</a>
+    </div>
+    <div class="kpi-card">
+        <p class="kpi-label">Archivos Excel</p>
+        <p class="kpi-value">{{ files_summary['data'] }}</p>
+        <a class="btn btn-outline btn-sm" href="{{ url_for('files', section='data') }}">Administrar data</a>
+    </div>
+    <div class="kpi-card">
+        <p class="kpi-label">Configuracion</p>
+        <p class="kpi-value">SMTP</p>
+        <a class="btn btn-outline btn-sm" href="{{ url_for('config') }}">Editar parametros</a>
     </div>
 </div>
 
 <div class="card">
-    <h2>Campaña Activa (config.json)</h2>
-    <table>
-        <tr><th>Excel</th><td>{{ config.get('excel_file', '-') }}</td></tr>
-        <tr><th>Template</th><td>{{ config.get('body_file', '-') }}</td></tr>
-        <tr><th>Asunto</th><td>{{ config.get('subject', '-') }}</td></tr>
-        <tr><th>Delay (s)</th><td>{{ config.get('delay_segundos', '-') }}</td></tr>
-    </table>
+    <h2>Campana Activa</h2>
+    <p class="muted">Valores actualmente guardados en <code>config.json</code>.</p>
+    <div class="table-wrap">
+        <table>
+            <tbody>
+                <tr><th>Archivo Excel</th><td>{{ config.get('excel_file', '-') }}</td></tr>
+                <tr><th>Template HTML</th><td>{{ config.get('body_file', '-') }}</td></tr>
+                <tr><th>Asunto</th><td>{{ config.get('subject', '-') }}</td></tr>
+                <tr><th>Delay (segundos)</th><td>{{ config.get('delay_segundos', '-') }}</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <div class="card">
     <h2>Envio por Consola</h2>
-    <p class="muted">Cuando termines de preparar y validar, ejecuta el envio completo en SSH:</p>
+    <p class="muted">Cuando termines la preparacion y el test, ejecuta este comando por SSH:</p>
     <div class="code">{{ send_command }}</div>
 </div>
 {% endblock %}

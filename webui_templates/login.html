@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Login | Panel{% endblock %}
 {% block content %}
-<div class="login-wrap">
-    <div class="card">
-        <h2>Panel de Campanas</h2>
-        <p class="muted">Acceso privado para gestionar templates, archivos Excel y configuracion.</p>
+<div class="login-shell">
+    <div class="auth-card">
+        <span class="tag">Panel privado de email</span>
+        <h1 class="auth-title">Ingreso seguro</h1>
+        <p class="muted">Gestiona templates, data y configuracion de campanas.</p>
 
         {% if not auth_ready %}
         <div class="flash danger">No hay credenciales configuradas. Define <code>PANEL_USERNAME</code> y <code>PANEL_PASSWORD_HASH</code> (o <code>PANEL_PASSWORD</code>) en <code>.env</code>.</div>
@@ -19,7 +20,9 @@
             <label for="password" style="margin-top: 12px;">Clave</label>
             <input id="password" type="password" name="password" required autocomplete="current-password">
 
-            <button class="btn btn-primary" type="submit" style="margin-top: 14px; width: 100%;">Ingresar</button>
+            <div class="actions">
+                <button class="btn btn-primary" type="submit" style="width: 100%;">Ingresar</button>
+            </div>
         </form>
     </div>
 </div>

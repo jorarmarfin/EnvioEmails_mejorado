@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import secrets
+import shutil
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
@@ -15,6 +16,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    send_file,
     session,
     url_for,
 )
@@ -227,6 +229,19 @@ def get_safe_file_path(section: str, filename: str) -> Path:
     return path
 
 
+def get_duplicate_template_path(source_path: Path) -> Path:
+    stem = source_path.stem
+    suffix = source_path.suffix
+
+    for index in range(1, 1000):
+        candidate = source_path.with_name(f"{stem}_copia{index}{suffix}")
+        if not candidate.exists():
+            return candidate
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return source_path.with_name(f"{stem}_copia_{timestamp}{suffix}")
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if session.get("logged_in"):
@@ -360,6 +375,37 @@ def delete_file(section: str, filename: str):
     return redirect(url_for("files", section=section))
 
 
+@app.route("/files/<section>/download/<filename>")
+@login_required
+def download_file(section: str, filename: str):
+    if section not in MANAGED_DIRECTORIES:
+        abort(404)
+
+    file_path = get_safe_file_path(section, filename)
+    if not file_path.exists() or not file_path.is_file():
+        abort(404)
+
+    return send_file(file_path, as_attachment=True, download_name=file_path.name)
+
+
+@app.route("/templates/duplicate/<filename>", methods=["POST"])
+@login_required
+def duplicate_template(filename: str):
+    validate_csrf()
+
+    source_path = get_safe_file_path("templates", filename)
+    if source_path.suffix.lower() not in ALLOWED_EXTENSIONS["templates"]:
+        abort(400, "Solo se pueden duplicar archivos HTML")
+    if not source_path.exists() or not source_path.is_file():
+        flash("El template ya no existe.", "warning")
+        return redirect(url_for("files", section="templates"))
+
+    destination = get_duplicate_template_path(source_path)
+    shutil.copy2(source_path, destination)
+    flash(f"Template duplicado: {destination.name}", "success")
+    return redirect(url_for("files", section="templates"))
+
+
 @app.route("/templates/edit/<filename>", methods=["GET", "POST"])
 @login_required
 def edit_template(filename: str):
@@ -379,6 +425,19 @@ def edit_template(filename: str):
 
     content = template_path.read_text(encoding="utf-8")
     return render_template("edit_template.html", filename=template_path.name, content=content)
+
+
+@app.route("/templates/view/<filename>")
+@login_required
+def view_template(filename: str):
+    template_path = get_safe_file_path("templates", filename)
+    if template_path.suffix.lower() not in ALLOWED_EXTENSIONS["templates"]:
+        abort(400, "Solo se pueden visualizar archivos HTML")
+    if not template_path.exists() or not template_path.is_file():
+        abort(404)
+
+    content = template_path.read_text(encoding="utf-8")
+    return render_template("view_template.html", filename=template_path.name, content=content)
 
 
 @app.route("/config", methods=["GET", "POST"])

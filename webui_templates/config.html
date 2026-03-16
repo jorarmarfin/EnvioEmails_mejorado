@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Configuracion | Panel{% endblock %}
 {% block content %}
+<div class="page-head">
+    <h1>Configuracion</h1>
+    <p class="muted">Define la campana activa y los parametros SMTP desde un solo panel.</p>
+</div>
+
 <div class="card">
-    <h1>Configuracion de Campana</h1>
+    <h2>Campana Activa</h2>
     <form method="post">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
         <input type="hidden" name="action" value="save_campaign">
 
-        <div class="row">
+        <div class="grid-2">
             <div>
                 <label for="excel_file">Archivo Excel (data/)</label>
                 <select id="excel_file" name="excel_file" required>
@@ -28,7 +33,7 @@
             </div>
         </div>
 
-        <div class="row" style="margin-top: 12px;">
+        <div class="grid-2" style="margin-top: 12px;">
             <div>
                 <label for="subject">Asunto</label>
                 <input id="subject" type="text" name="subject" value="{{ current_config.get('subject', '') }}" required>
@@ -39,17 +44,19 @@
             </div>
         </div>
 
-        <button class="btn btn-primary" type="submit" style="margin-top: 14px;">Guardar campana</button>
+        <div class="actions">
+            <button class="btn btn-primary" type="submit">Guardar campana</button>
+        </div>
     </form>
 </div>
 
 <div class="card">
-    <h2>Configuracion SMTP (.env)</h2>
+    <h2>SMTP</h2>
     <form method="post">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
         <input type="hidden" name="action" value="save_smtp">
 
-        <div class="row">
+        <div class="grid-2">
             <div>
                 <label for="smtp_host">SMTP_HOST</label>
                 <input id="smtp_host" type="text" name="smtp_host" value="{{ smtp_config.smtp_host }}" required>
@@ -60,7 +67,7 @@
             </div>
         </div>
 
-        <div class="row" style="margin-top: 12px;">
+        <div class="grid-2" style="margin-top: 12px;">
             <div>
                 <label for="smtp_user">SMTP_USER</label>
                 <input id="smtp_user" type="text" name="smtp_user" value="{{ smtp_config.smtp_user }}" required>
@@ -76,13 +83,15 @@
             <input id="smtp_password" type="password" name="smtp_password" placeholder="Deja vacio para mantener la clave actual">
         </div>
 
-        <button class="btn btn-primary" type="submit" style="margin-top: 14px;">Guardar SMTP</button>
+        <div class="actions">
+            <button class="btn btn-primary" type="submit">Guardar SMTP</button>
+        </div>
     </form>
 </div>
 
 <div class="card">
-    <h2>Envio por Consola</h2>
-    <p class="muted">Cuando este todo listo y validado:</p>
+    <h2>Envio por consola</h2>
+    <p class="muted">Cuando termines la preparacion y las pruebas:</p>
     <div class="code">python3 sender.py</div>
 </div>
 {% endblock %}
